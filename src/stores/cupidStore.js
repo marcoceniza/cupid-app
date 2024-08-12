@@ -1,17 +1,29 @@
 // import {  } from 'vue';
 import axios from 'axios';
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 
 export const useCupidStore = defineStore('cupid', () => {
     const apiUrl = import.meta.env.VITE_API_URL;
+    const msgLoading = ref(false);
     const isLoading = ref(false);
     const message = ref('');
+    const messageList = ref([]);
+    const msg = ref(false);
+    const comments = ref(false);
+    const msgComment = ref('');
+    const commentID = ref('');
+    const msg_comment = ref('');
 
     const index = async () => {
-        try{
+        try {
+            msgLoading.value = true
             const res = await axios.get(apiUrl);
-            console.log(res.data.result);
+
+            if(res.data.success) {
+                msgLoading.value = false
+                messageList.value = res.data.result;
+            }
         }catch(error) {
             console.log('Something went wrong: ', error);
         }
@@ -26,13 +38,64 @@ export const useCupidStore = defineStore('cupid', () => {
             formData.append('message', message.value);
 
             const res = await axios.post(apiUrl + 'store', formData);
-            if(!res.data.success) return;
-            isLoading.value = false;
-            message.value = '';
+
+            if(res.data.success) {
+                isLoading.value = false;
+                msg.value = false;
+                message.value = '';
+
+                index();
+            }
         }catch(error) {
             console.log('Something went wrong: ', error);
         }
     }
 
-    return { apiUrl, message, store, isLoading }
+    const viewComment = (id) => {
+        try {
+            commentID.value = id;
+            messageList.value.forEach(msg => {
+                if(msg.message_id === id) {
+                    msgComment.value = msg.message_content
+                }
+            });
+        }catch(error) {
+            console.log('Something went wrong: ', error);
+        }
+    }
+
+    const viewCommentList = (id) => {
+        try {
+            messageList.value.forEach(msg => {
+                if(msg.message_id === id) {
+                    msgComment.value = msg.message_content
+                }
+            });
+        }catch(error) {
+            console.log('Something went wrong: ', error);
+        }
+    }
+
+    const addComment = async () => {
+        try {
+            const formData = new FormData();
+            formData.append('id', commentID.value);
+            formData.append('comment', msg_comment.value);
+
+            const res = await axios.post(apiUrl + 'storeComment', formData);
+
+            if(res.data.result) {
+                console.log('Success...');
+            }
+        }catch(error) {
+            console.log('Something went wrong: ', error);
+        }
+    }
+
+    return {
+        apiUrl, message, store, isLoading, 
+        messageList, msg, comments, msgLoading, 
+        viewComment, msgComment, msg_comment,
+        addComment, viewCommentList
+    }
 })

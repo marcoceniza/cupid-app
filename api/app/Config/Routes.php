@@ -8,3 +8,4 @@ use CodeIgniter\Router\RouteCollection;
 // $routes->get('/', 'Home::index');
 $routes->get('/', 'Cupid::index');
 $routes->post('store', 'Cupid::store');
+$routes->post('storeComment', 'Cupid::storeComment');

@@ -49,4 +49,34 @@ class Cupid extends BaseController
             exit($e->getMessage());
         }
     }
+
+    public function storeComment() {
+        try {
+            $CupidModel = model(CupidModel::class);
+            $post = $this->request->getPost(['id', 'comment']);
+
+            if(empty($post['comment'])) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Field are empty!'
+                ]);
+            }
+    
+            $data = [
+                'message_id' => $post['id'],
+                'commenter_name' => 'unanimous',
+                'comment_content' => $post['comment'],
+                'timestamp' => date('Y-m-d')
+            ];
+    
+            $CupidModel->createComment($data);
+    
+            return $this->response->setJSON([
+                'success' => true,
+                'result'=> 'Added Comment Succesfully'
+            ]);
+        }catch (\Exception $e) {
+            exit($e->getMessage());
+        }
+    }
 }
