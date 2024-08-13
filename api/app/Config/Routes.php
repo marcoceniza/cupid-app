@@ -5,7 +5,10 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-// $routes->get('/', 'Home::index');
-$routes->get('/', 'Cupid::index');
-$routes->post('store', 'Cupid::store');
-$routes->post('storeComment', 'Cupid::storeComment');
+// Message
+$routes->get('/', 'Message::index');
+$routes->post('store-message', 'Message::store');
+
+// Comment
+$routes->get('comments/(:num)', 'Comment::index/$1');
+$routes->post('store-comment', 'Comment::store');

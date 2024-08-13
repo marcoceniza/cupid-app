@@ -1,7 +1,6 @@
-// import {  } from 'vue';
 import axios from 'axios';
 import { defineStore } from 'pinia';
-import { reactive, ref } from 'vue';
+import { ref } from 'vue';
 
 export const useCupidStore = defineStore('cupid', () => {
     const apiUrl = import.meta.env.VITE_API_URL;
@@ -11,7 +10,8 @@ export const useCupidStore = defineStore('cupid', () => {
     const messageList = ref([]);
     const msg = ref(false);
     const comments = ref(false);
-    const msgComment = ref('');
+    const msgComment = ref([]);
+    const msgCommentList = ref('');
     const commentID = ref('');
     const msg_comment = ref('');
 
@@ -37,7 +37,7 @@ export const useCupidStore = defineStore('cupid', () => {
             const formData = new FormData();
             formData.append('message', message.value);
 
-            const res = await axios.post(apiUrl + 'store', formData);
+            const res = await axios.post(apiUrl + 'store-message', formData);
 
             if(res.data.success) {
                 isLoading.value = false;
@@ -51,21 +51,13 @@ export const useCupidStore = defineStore('cupid', () => {
         }
     }
 
-    const viewComment = (id) => {
+    const viewComment = async (id) => {
         try {
             commentID.value = id;
-            messageList.value.forEach(msg => {
-                if(msg.message_id === id) {
-                    msgComment.value = msg.message_content
-                }
-            });
-        }catch(error) {
-            console.log('Something went wrong: ', error);
-        }
-    }
 
-    const viewCommentList = (id) => {
-        try {
+            const res = await axios.get(apiUrl + `comments/${id}`);
+            msgCommentList.value = res.data.result;
+
             messageList.value.forEach(msg => {
                 if(msg.message_id === id) {
                     msgComment.value = msg.message_content
@@ -82,7 +74,7 @@ export const useCupidStore = defineStore('cupid', () => {
             formData.append('id', commentID.value);
             formData.append('comment', msg_comment.value);
 
-            const res = await axios.post(apiUrl + 'storeComment', formData);
+            const res = await axios.post(apiUrl + 'store-comment', formData);
 
             if(res.data.result) {
                 console.log('Success...');
@@ -96,6 +88,6 @@ export const useCupidStore = defineStore('cupid', () => {
         apiUrl, message, store, isLoading, 
         messageList, msg, comments, msgLoading, 
         viewComment, msgComment, msg_comment,
-        addComment, viewCommentList
+        addComment, msgCommentList
     }
 })

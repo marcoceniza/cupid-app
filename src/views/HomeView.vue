@@ -12,7 +12,7 @@
           <PaperAirplaneIcon @click="cupidStore.store" class="size-5 text-[#b7213b] absolute bottom-[18px] right-[20px] cursor-pointer hover:opacity-[0.5]" />
         </section>
         <p v-if="cupidStore.msgLoading" class="text-center text-[#7d7d7d] mt-5">Loading...</p>
-        <section v-else v-for="msg in cupidStore.messageList">
+        <section v-else v-for="msg in cupidStore.messageList" :key="msg">
           <p>{{ msg.message_content }}</p>
           <span @click="cupidStore.comments = true; cupidStore.viewComment(msg.message_id)" class="text-right block mt-[10px] text-[14px] cursor-pointer hover:underline">15 comments</span>
         </section>
@@ -26,7 +26,7 @@
             <p class="bg-[#ffe3e8] p-[12px] rounded-[4px] mb-[25px]">{{ cupidStore.msgComment }}</p>
             <hr class="bg-[#d97183] mb-5">
             <ul class="mb-5">
-              <li class="bg-[#eee] mb-[5px] rounded-[30px] leading-[16px] text-[15px] p-[12px] text-[#797979]">Comment 1</li>
+              <li v-for="comment in cupidStore.msgCommentList" :key="comment" class="bg-[#eee] mb-[5px] rounded-[30px] leading-[16px] text-[15px] p-[12px] text-[#797979]">{{ comment.comment_content }}</li>
             </ul>
           </div>
           <div class="relative">
@@ -55,6 +55,7 @@ const cupidStore = useCupidStore();
   width: 280px;
   max-width: 100%;
   position: relative;
+  min-height: 282px;
 }
 .msg_wrap section p {
   border-bottom: 1px solid #cc7282;
