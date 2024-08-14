@@ -1,10 +1,13 @@
 import axios from 'axios';
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 
 export const useCupidStore = defineStore('cupid', () => {
     const apiUrl = import.meta.env.VITE_API_URL;
-    const msgLoading = ref(false);
+    const loader = reactive({
+        message: false,
+        comment: false,
+    });
     const isLoading = ref(false);
     const message = ref('');
     const messageList = ref([]);
@@ -17,11 +20,11 @@ export const useCupidStore = defineStore('cupid', () => {
 
     const index = async () => {
         try {
-            msgLoading.value = true
+            loader.message = true
             const res = await axios.get(apiUrl);
 
             if(res.data.success) {
-                msgLoading.value = false
+                loader.message = false
                 messageList.value = res.data.result;
             }
         }catch(error) {
@@ -54,13 +57,16 @@ export const useCupidStore = defineStore('cupid', () => {
     const viewComment = async (id) => {
         try {
             commentID.value = id;
-
+            loader.comment = true;
+            msgCommentList.value = [];
             const res = await axios.get(apiUrl + `comments/${id}`);
-            msgCommentList.value = res.data.result;
+
+            if(res.data.success) msgCommentList.value = res.data.result;
 
             messageList.value.forEach(msg => {
                 if(msg.message_id === id) {
-                    msgComment.value = msg.message_content
+                    msgComment.value = msg.message_content;
+                    loader.comment = false;
                 }
             });
         }catch(error) {
@@ -76,9 +82,9 @@ export const useCupidStore = defineStore('cupid', () => {
 
             const res = await axios.post(apiUrl + 'store-comment', formData);
 
-            if(res.data.result) {
-                console.log('Success...');
-            }
+            if(res.data.success) msg_comment.value = '';
+
+            viewComment(commentID.value);
         }catch(error) {
             console.log('Something went wrong: ', error);
         }
@@ -86,7 +92,7 @@ export const useCupidStore = defineStore('cupid', () => {
 
     return {
         apiUrl, message, store, isLoading, 
-        messageList, msg, comments, msgLoading, 
+        messageList, msg, comments, loader, 
         viewComment, msgComment, msg_comment,
         addComment, msgCommentList
     }

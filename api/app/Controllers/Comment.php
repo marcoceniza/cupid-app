@@ -21,7 +21,7 @@ class Comment extends BaseController
                     'result' => $data
                 ]);
             }else {
-                throw new \Exception('No Data Found');
+                throw new \Exception('No comments available');
             }
         }catch (\Exception $e) {
             return $this->response->setJSON([
